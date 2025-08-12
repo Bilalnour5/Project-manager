@@ -1,0 +1,23 @@
+:root {
+  --font-family: "Roboto", sans-serif;
+  --bg-color: #dfe2ec;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+* {
+  margin: 0;
+  padding: 0;
+}
+html,
+body {
+  height: 100%;
+  font-family: var(--font-family);
+  background-color: var(--bg-color);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

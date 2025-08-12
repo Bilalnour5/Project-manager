@@ -1,0 +1,31 @@
+.navbar_container {
+  display: flex;
+  align-items: center;
+  margin: 30px 0;
+}
+.searchbar {
+  display: flex;
+  margin-left: 200px;
+  align-items: center;
+}
+
+.account_container {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  margin-right: 30px;
+}
+.user_container {
+  display: flex;
+  align-items: center;
+  padding-left: 30px;
+  border-left: 2px solid #000;
+}
+.user_icon {
+  margin-right: 10px;
+}
+
+.notifications {
+  margin-right: 20px;
+  margin-left: 10px;
+}
