@@ -194,7 +194,7 @@ Distributed under the [MIT License](LICENSE).
 
 ## Contact
 
-Your Name - your.email@example.com
+Your Name - billnour8@gmail.com
 
 Project Link: [https://github.com/yourusername/project-manager](https://github.com/yourusername/project-manager)
 
@@ -203,4 +203,4 @@ Project Link: [https://github.com/yourusername/project-manager](https://github.c
 - [Vite](https://vitejs.dev/)
 - [Django](https://www.djangoproject.com/)
 - [Django REST Framework](https://www.django-rest-framework.org/)
-- Any other libraries or frameworks used
+
