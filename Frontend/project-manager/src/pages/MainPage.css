@@ -1,12 +1,15 @@
 .layout {
   overflow: auto;
   display: grid;
-  grid-template-columns: 6.25rem 1.5fr 1fr 6.25rem;
+  grid-template-columns: 150px 1.5fr 1fr 6.25rem;
   grid-template-rows: repeat(6, auto);
 }
 .sidebar_container {
-  width: 100px;
-  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 30px;
+
   grid-row: 1 / -1;
   grid-column: 1 / 2;
 }

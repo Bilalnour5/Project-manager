@@ -1,0 +1,13 @@
+.sidebar_item {
+  margin-top: 30px;
+}
+.home_circle {
+  height: 70px;
+  width: 70px;
+  border-radius: 50%;
+  background-color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
