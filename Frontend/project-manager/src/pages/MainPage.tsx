@@ -4,14 +4,33 @@ import "./MainPage.css";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
-import CardActionArea from "@mui/material/CardActionArea";
 import SearchIcon from "@mui/icons-material/Search";
 import IconButton from "@mui/material/IconButton";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
+import { useState, useEffect } from "react";
+import { getProjects } from "../services/projectService";
+import type { ProjectData } from "../types/projects";
 
 function FrontPage() {
+  const [projects, setProjects] = useState<ProjectData[]>([]);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const data = await getProjects();
+        setProjects(data);
+      } catch (error) {
+        console.error("Failed to fetch projects:", error);
+      }
+    };
+
+    fetchProjects();
+
+    console.log("Projects fetched:", projects);
+  }, []);
+
   return (
     <>
       <div className="layout">
@@ -29,174 +48,91 @@ function FrontPage() {
             </div>
           </div>
           <div className="project-grid">
-            <Card
-              sx={{
-                maxWidth: 345,
-                boxShadow: "0px 0px 13px 0px rgba(0,0,0,0.1)",
-                bgcolor: "#ffff",
-                borderRadius: 10,
-
-                padding: 0.5,
-                height: 300,
-              }}
-            >
-              {/* Header with date and menu button */}
-              <Box
+            {projects.map((project) => (
+              <Card
                 sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  p: 2,
+                  maxWidth: 345,
+                  boxShadow: "0px 0px 13px 0px rgba(0,0,0,0.2)",
+                  bgcolor: "#ffff",
+                  borderRadius: 10,
+
+                  padding: 0.5,
+                  height: 300,
                 }}
               >
-                <Typography variant="body2" color="text.secondary">
-                  May 15, 2023
-                </Typography>
-                <IconButton aria-label="settings" disabled>
-                  <MoreVertIcon />
-                </IconButton>
-              </Box>
-
-              {/* Centered content */}
-              <CardContent
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  textAlign: "center",
-                }}
-              >
-                <Typography gutterBottom variant="h5" component="div">
-                  Project Name
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ marginBottom: 3 }}
-                >
-                  Project description or content here
-                </Typography>
+                {/* Header with date and menu button */}
                 <Box
                   sx={{
-                    width: "80%",
                     display: "flex",
-                    flexDirection: "column",
+                    justifyContent: "space-between",
                     alignItems: "center",
+                    p: 2,
                   }}
                 >
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ marginRight: "auto" }}
-                  >
-                    Progress
+                  <Typography variant="body2" color="text.secondary">
+                    May 15, 2023
                   </Typography>
-                  <LinearProgress
-                    variant="determinate"
-                    value={65}
-                    sx={{
-                      height: 8,
-                      borderRadius: 4,
-                      width: "100%",
-                      mb: 1,
-                    }}
-                  />
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ marginLeft: "auto" }}
-                  >
-                    65%
-                  </Typography>
+                  <IconButton aria-label="settings" disabled>
+                    <MoreVertIcon />
+                  </IconButton>
                 </Box>
-              </CardContent>
-            </Card>
-            <Card
-              sx={{
-                maxWidth: 345,
-                boxShadow: "0px 0px 13px 0px rgba(0,0,0,0.1)",
-                bgcolor: "#fee4cb",
-                borderRadius: 10,
-                height: 300,
-              }}
-            >
-              {/* Header with date and menu button */}
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  p: 2,
-                }}
-              >
-                <Typography variant="body2" color="text.secondary">
-                  May 15, 2023
-                </Typography>
-                <IconButton aria-label="settings" disabled>
-                  <MoreVertIcon />
-                </IconButton>
-              </Box>
 
-              {/* Centered content */}
-              <CardContent
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  textAlign: "center",
-                }}
-              >
-                <Typography gutterBottom variant="h5" component="div">
-                  Project Name
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ marginBottom: 1 }}
-                >
-                  Project description or content here
-                </Typography>
-                <Box
+                {/* Centered content */}
+                <CardContent
                   sx={{
-                    width: "80%",
                     display: "flex",
                     flexDirection: "column",
+                    justifyContent: "center",
                     alignItems: "center",
+                    textAlign: "center",
                   }}
                 >
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ marginRight: "auto", marginBottom: 0.5 }}
-                  >
-                    Progress
+                  <Typography gutterBottom variant="h5" component="div">
+                    Project Name
                   </Typography>
-                  <LinearProgress
-                    variant="determinate"
-                    value={65}
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ marginBottom: 3 }}
+                  >
+                    Project description or content here
+                  </Typography>
+                  <Box
                     sx={{
-                      height: 8,
-                      borderRadius: 4,
-                      width: "100%",
-                      backgroundColor: "#fff",
-                      "& .MuiLinearProgress-bar": {
-                        backgroundColor: "#f37441", // Teal progress
-                      },
-                      mb: 1,
+                      width: "80%",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
                     }}
-                  />
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ marginLeft: "auto" }}
                   >
-                    65%
-                  </Typography>
-                </Box>
-              </CardContent>
-            </Card>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ marginRight: "auto" }}
+                    >
+                      Progress
+                    </Typography>
+                    <LinearProgress
+                      variant="determinate"
+                      value={65}
+                      sx={{
+                        height: 8,
+                        borderRadius: 4,
+                        width: "100%",
+                        mb: 1,
+                      }}
+                    />
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ marginLeft: "auto" }}
+                    >
+                      65%
+                    </Typography>
+                  </Box>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
         <div className="task_container">
