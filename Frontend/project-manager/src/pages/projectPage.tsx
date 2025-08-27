@@ -14,6 +14,28 @@ function projectPage() {
   const [project, setProject] = useState<ProjectData>();
   const [task, setTask] = useState<TaskData[]>([]);
 
+  const statusMap = {
+    not_started: "Not Started",
+    in_progress: "In Progress",
+    completed: "Completed",
+  };
+
+  const extractHeadersFromData = (data: TaskData[]) => {
+    if (!data || data.length === 0) return [];
+    const keys = Object.keys(data[0]);
+
+    // Use slice to get from 2nd element (index 1) to 2nd last element (index -1)
+    const filteredKeys = keys.slice(1, -1);
+    // Get keys from first item and format them
+    return filteredKeys.map((key) => ({
+      key,
+      // Format key to title case (e.g., "taskName" -> "Task Name")
+      label: key
+        .replace(/_/g, " ")
+        .replace(/(^|\s)[a-z]/g, (str) => str.toUpperCase()),
+    }));
+  };
+
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -43,8 +65,15 @@ function projectPage() {
           <Sidebar />
         </div>
         <div className="main_container">
-          <div className="title_container">
-            <h1>Project Name: {project?.name}</h1>
+          <div className="project_title_container">
+            <div>
+              <h1 className="project_title">Project Name: {project?.name}</h1>
+              <p>number of task 7</p>
+            </div>
+
+            <button>
+              <a href="/createTask">+ Add Task</a>
+            </button>
           </div>
           <div className="task_tracker">
             <div className="task_todo task_tracker--info">
@@ -84,18 +113,27 @@ function projectPage() {
               </div>
             </div>
           </div>
-          <div className="task_grid">
-            <div className="task-list">
-              <h2>Tasks</h2>
+          <table className="task_table">
+            <thead>
+              <tr>
+                {extractHeadersFromData(task).map((header) => (
+                  <th key={header.key}>{header.label}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
               {task.map((task) => (
-                <div key={task?.id} className="task-item">
-                  <h3>{task?.name}</h3>
-                  <p>{task?.detail}</p>
-                  <p>Status: {task?.is_completed ? "Completed" : "Pending"}</p>
-                </div>
+                <tr key={task?.id}>
+                  <td>{task?.name}</td>
+                  <td>{task?.detail}</td>
+                  <td>{task?.priority}</td>
+                  <td>{task?.time_spent_hours}</td>
+                  <td>{task?.estimated_hours}</td>
+                  <td>{statusMap[task?.status]}</td>
+                </tr>
               ))}
-            </div>
-          </div>
+            </tbody>
+          </table>
         </div>
       </div>
     </>
