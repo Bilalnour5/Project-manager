@@ -1,6 +1,7 @@
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import "./MainPage.css";
+import "../layout.css";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
@@ -11,10 +12,13 @@ import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
 import { useState, useEffect } from "react";
 import { getProjects } from "../services/projectService";
+import { getTasks } from "../services/taskService";
 import type { ProjectData } from "../types/projects";
+import type { TaskData } from "../types/tasks";
 
 function FrontPage() {
   const [projects, setProjects] = useState<ProjectData[]>([]);
+  const [tasks, setTasks] = useState<TaskData[]>([]);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -25,10 +29,17 @@ function FrontPage() {
         console.error("Failed to fetch projects:", error);
       }
     };
+    const fetchTasks = async () => {
+      try {
+        const data = await getTasks();
+        setTasks(data);
+      } catch (error) {
+        console.error("Failed to fetch tasks:", error);
+      }
+    };
 
     fetchProjects();
-
-    console.log("Projects fetched:", projects);
+    fetchTasks();
   }, []);
 
   return (
@@ -70,7 +81,7 @@ function FrontPage() {
                   }}
                 >
                   <Typography variant="body2" color="text.secondary">
-                    May 15, 2023
+                    {project.deadline}
                   </Typography>
                   <IconButton aria-label="settings" disabled>
                     <MoreVertIcon />
@@ -88,14 +99,14 @@ function FrontPage() {
                   }}
                 >
                   <Typography gutterBottom variant="h5" component="div">
-                    Project Name
+                    {project.name}
                   </Typography>
                   <Typography
                     variant="body2"
                     color="text.secondary"
                     sx={{ marginBottom: 3 }}
                   >
-                    Project description or content here
+                    {project.description}
                   </Typography>
                   <Box
                     sx={{
@@ -141,23 +152,25 @@ function FrontPage() {
 
             <SearchIcon sx={{ fontSize: 30 }} />
           </div>
-          <div className="task_item">
-            <div className="task_item_container">
-              <div className="task_project"></div>
-              <div className="task_detail">
-                <h2 className="task_name">Example task</h2>
-                <p className="task_description">Template task description</p>
-                <p className="task_deadline">12/08/2025</p>
+          {tasks.map((task) => (
+            <div className="task_item" key={task.id}>
+              <div className="task_item_container">
+                <div className="task_project"></div>
+                <div className="task_detail">
+                  <h2 className="task_name">{task.name}</h2>
+                  <p className="task_description">{task.detail}</p>
+                  <p className="task_deadline">Deadline: N/A</p>
+                </div>
+                <IconButton
+                  aria-label="settings"
+                  disabled
+                  sx={{ marginLeft: "auto" }}
+                >
+                  <MoreVertIcon sx={{ fontSize: 40 }} />
+                </IconButton>
               </div>
-              <IconButton
-                aria-label="settings"
-                disabled
-                sx={{ marginLeft: "auto" }}
-              >
-                <MoreVertIcon sx={{ fontSize: 40 }} />
-              </IconButton>
             </div>
-          </div>
+          ))}
         </div>
       </div>
     </>

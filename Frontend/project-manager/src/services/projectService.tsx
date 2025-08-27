@@ -46,3 +46,14 @@ export const deleteProject = async (projectId: number) => {
     throw error;
   }
 };
+
+export const getProjectById = async (projectId: number) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/${projectId}`);
+    console.log(`Project ${projectId} fetched from API:`, response.data);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching project ${projectId}:`, error);
+    throw error;
+  }
+};
