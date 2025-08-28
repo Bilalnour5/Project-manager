@@ -13,6 +13,7 @@ import AutorenewOutlinedIcon from "@mui/icons-material/AutorenewOutlined";
 function projectPage() {
   const [project, setProject] = useState<ProjectData>();
   const [task, setTask] = useState<TaskData[]>([]);
+  const [addTaskOpen, setAddTaskOpen] = useState(false);
 
   const statusMap = {
     not_started: "Not Started",
@@ -71,15 +72,18 @@ function projectPage() {
               <p>number of task 7</p>
             </div>
 
-            <button>
-              <a href="/createTask">+ Add Task</a>
+            <button
+              onClick={() => setAddTaskOpen(true)}
+              className="add_task_button"
+            >
+              + Add Task
             </button>
           </div>
           <div className="task_tracker">
             <div className="task_todo task_tracker--info">
               <div className="task_icon">
                 <FormatListBulletedOutlinedIcon
-                  style={{ fontSize: 40, color: "#4A90E2" }}
+                  style={{ fontSize: 40, color: "#5150f3" }}
                 />
               </div>
               <div className="task_tracker--detail">
@@ -135,9 +139,65 @@ function projectPage() {
             </tbody>
           </table>
         </div>
+
+        {addTaskOpen && (
+          <div className="add_task_overlay">
+            <div className="add_task_container">
+              <div className="add_task_form">
+                <h3>Add New Task</h3>
+                <label htmlFor="name">Task Name: </label>
+                <input type="text" className="add_task_input" id="name" />
+                <label htmlFor="detail">Detail: </label>
+                <input type="text" className="add_task_input" id="detail" />
+                <label htmlFor="priority">Priority: </label>
+                <select className="add_task_input" id="priority">
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+                <label htmlFor="time_spent_hours">Time Spent (hours): </label>
+                <input
+                  type="number"
+                  className="add_task_input"
+                  id="time_spent_hours"
+                />
+                <label htmlFor="estimated_hours">Estimated Hours: </label>
+                <input
+                  type="number"
+                  className="add_task_input"
+                  id="estimated_hours"
+                />
+                <label htmlFor="status">Status: </label>
+                <select className="add_task_input" id="status">
+                  <option value="not_started">Not Started</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="completed">Completed</option>
+                </select>
+                <button className="submit_task_button">Add Task</button>
+              </div>
+              <button
+                className="close_add_task"
+                onClick={() => setAddTaskOpen(false)}
+              >
+                X
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
 }
+
+// export interface TaskData {
+//   id: number;
+//   name: string;
+//   detail: string;
+//   priority: "low" | "medium" | "high";
+//   time_spent_hours: number;
+//   estimated_hours: number;
+//   status: "not_started" | "in_progress" | "completed";
+//   project: number; // required foreign key (Project.id)
+// }
 
 export default projectPage;
