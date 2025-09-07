@@ -1,9 +1,10 @@
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import "./projectPage.css";
 import "../layout.css";
-import { useState, useEffect } from "react";
 import { getProjectById } from "../services/projectService";
-import { getTasksByProject } from "../services/taskService";
+import { getTasksByProject, createTask } from "../services/taskService";
 import type { ProjectData } from "../types/projects";
 import type { TaskData } from "../types/tasks";
 import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutlineOutlined";
@@ -11,20 +12,61 @@ import FormatListBulletedOutlinedIcon from "@mui/icons-material/FormatListBullet
 import AutorenewOutlinedIcon from "@mui/icons-material/AutorenewOutlined";
 
 function projectPage() {
+  const params = useParams();
+
+  const projectId = params.id ? parseInt(params.id) : 0;
+
   const [project, setProject] = useState<ProjectData>();
   const [task, setTask] = useState<TaskData[]>([]);
   const [addTaskOpen, setAddTaskOpen] = useState(false);
+
+  const [newTask, setNewTask] = useState<Omit<TaskData, "id">>({
+    name: "",
+    detail: "",
+    priority: "medium",
+    time_spent_hours: 0,
+    estimated_hours: 0,
+    status: "not_started",
+    project: projectId,
+  });
 
   const statusMap = {
     not_started: "Not Started",
     in_progress: "In Progress",
     completed: "Completed",
   };
+  // Creating Task object for form
 
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    console.log(name, value);
+    setNewTask((prevTask) => ({
+      ...prevTask,
+      [name]:
+        name === "time_spent_hours" || name === "estimated_hours"
+          ? Number(value)
+          : value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const createdTask = await createTask(newTask);
+      setTask((prevTasks) => [...prevTasks, createdTask]);
+      setAddTaskOpen(false);
+    } catch (error) {
+      console.error("Failed to create task:", error);
+    }
+    console.log("Form submitted:", newTask);
+  };
+
+  // Function to extract headers from TaskData
   const extractHeadersFromData = (data: TaskData[]) => {
     if (!data || data.length === 0) return [];
     const keys = Object.keys(data[0]);
-
     // Use slice to get from 2nd element (index 1) to 2nd last element (index -1)
     const filteredKeys = keys.slice(1, -1);
     // Get keys from first item and format them
@@ -38,9 +80,9 @@ function projectPage() {
   };
 
   useEffect(() => {
-    const fetchProjects = async () => {
+    const fetchProject = async () => {
       try {
-        const data = await getProjectById(1);
+        const data = await getProjectById(projectId);
         setProject(data);
       } catch (error) {
         console.error("Failed to fetch projects:", error);
@@ -48,14 +90,14 @@ function projectPage() {
     };
     const fetchTasks = async () => {
       try {
-        const data = await getTasksByProject(1);
+        const data = await getTasksByProject(projectId);
         setTask(data);
       } catch (error) {
         console.error("Failed to fetch tasks:", error);
       }
     };
 
-    fetchProjects();
+    fetchProject();
     fetchTasks();
   }, []);
 
@@ -143,38 +185,57 @@ function projectPage() {
         {addTaskOpen && (
           <div className="add_task_overlay">
             <div className="add_task_container">
-              <div className="add_task_form">
+              <form className="add_task_form" onSubmit={handleSubmit}>
                 <h3>Add New Task</h3>
+
                 <label htmlFor="name">Task Name: </label>
-                <input type="text" className="add_task_input" id="name" />
+                <input
+                  type="text"
+                  className="add_task_input"
+                  name="name"
+                  onChange={handleInputChange}
+                />
+
                 <label htmlFor="detail">Detail: </label>
-                <input type="text" className="add_task_input" id="detail" />
+                <input
+                  type="text"
+                  className="add_task_input"
+                  name="detail"
+                  onChange={handleInputChange}
+                />
+
                 <label htmlFor="priority">Priority: </label>
-                <select className="add_task_input" id="priority">
+                <select
+                  className="add_task_input"
+                  name="priority"
+                  onChange={handleInputChange}
+                >
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
                   <option value="high">High</option>
                 </select>
-                <label htmlFor="time_spent_hours">Time Spent (hours): </label>
-                <input
-                  type="number"
-                  className="add_task_input"
-                  id="time_spent_hours"
-                />
+
                 <label htmlFor="estimated_hours">Estimated Hours: </label>
                 <input
                   type="number"
                   className="add_task_input"
-                  id="estimated_hours"
+                  name="estimated_hours"
+                  onChange={handleInputChange}
                 />
+
                 <label htmlFor="status">Status: </label>
-                <select className="add_task_input" id="status">
+                <select
+                  className="add_task_input"
+                  name="status"
+                  onChange={handleInputChange}
+                >
                   <option value="not_started">Not Started</option>
                   <option value="in_progress">In Progress</option>
                   <option value="completed">Completed</option>
                 </select>
+
                 <button className="submit_task_button">Add Task</button>
-              </div>
+              </form>
               <button
                 className="close_add_task"
                 onClick={() => setAddTaskOpen(false)}
@@ -188,16 +249,5 @@ function projectPage() {
     </>
   );
 }
-
-// export interface TaskData {
-//   id: number;
-//   name: string;
-//   detail: string;
-//   priority: "low" | "medium" | "high";
-//   time_spent_hours: number;
-//   estimated_hours: number;
-//   status: "not_started" | "in_progress" | "completed";
-//   project: number; // required foreign key (Project.id)
-// }
 
 export default projectPage;

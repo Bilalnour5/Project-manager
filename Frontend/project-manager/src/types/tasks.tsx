@@ -8,3 +8,5 @@ export interface TaskData {
   status: "not_started" | "in_progress" | "completed";
   project: number; // required foreign key (Project.id)
 }
+
+export type CreateTaskData = Omit<TaskData, "id">;

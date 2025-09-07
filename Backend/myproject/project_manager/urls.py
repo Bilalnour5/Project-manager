@@ -7,5 +7,5 @@ urlpatterns = [
     path('projects/', views.ProjectListCreateView.as_view(), name='project-list'),
     path('projects/<int:pk>/', views.ProjectRetrieveUpdateDestroyView.as_view(), name='project-detail'),
     path('tasks/', views.TaskListCreateView.as_view(), name='task-list'),
-    path('tasks/<int:pk>/', views.TaskRetrieveUpdateDestroyView.as_view(), name='task-detail'),
+    path('tasks/<int:project_id>/', views.TaskListCreateView.as_view(), name='project-tasks'),
 ]
