@@ -15,10 +15,19 @@ import { getProjects } from "../services/projectService";
 import { getTasks } from "../services/taskService";
 import type { ProjectData } from "../types/projects";
 import type { TaskData } from "../types/tasks";
+import { useSearchParams, useNavigate } from "react-router-dom";
 
 function FrontPage() {
   const [projects, setProjects] = useState<ProjectData[]>([]);
   const [tasks, setTasks] = useState<TaskData[]>([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const query = searchParams.get("query") || "";
+    console.log("Search query:", query);
+    // You can implement filtering logic here based on the query
+  }, [searchParams]);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -61,6 +70,7 @@ function FrontPage() {
           <div className="project-grid">
             {projects.map((project) => (
               <Card
+                onClick={() => navigate(`/project/?project_id=${project.id}`)}
                 sx={{
                   maxWidth: 345,
                   boxShadow: "0px 0px 13px 0px rgba(0,0,0,0.2)",
@@ -69,6 +79,13 @@ function FrontPage() {
 
                   padding: 0.5,
                   height: 300,
+                  transition: "0.3s",
+
+                  "&:hover": {
+                    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)", // Make shadow deeper
+                    cursor: "pointer",
+                    transform: "scale(1.02)", // Optional: slightly grow the card
+                  },
                 }}
               >
                 {/* Header with date and menu button */}
@@ -100,13 +117,6 @@ function FrontPage() {
                 >
                   <Typography gutterBottom variant="h5" component="div">
                     {project.name}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ marginBottom: 3 }}
-                  >
-                    {project.description}
                   </Typography>
                   <Box
                     sx={{
@@ -158,7 +168,6 @@ function FrontPage() {
                 <div className="task_project"></div>
                 <div className="task_detail">
                   <h2 className="task_name">{task.name}</h2>
-                  <p className="task_description">{task.detail}</p>
                   <p className="task_deadline">Deadline: N/A</p>
                 </div>
                 <IconButton

@@ -23,12 +23,12 @@ export const createProject = async (projectData: ProjectData) => {
 };
 export const updateProject = async (
   projectId: number,
-  projectData: ProjectData
+  projectData: ProjectData,
 ) => {
   try {
     const response = await axios.put(
       `${API_BASE_URL}/${projectId}`,
-      projectData
+      projectData,
     );
     return response.data;
   } catch (error) {
@@ -49,7 +49,7 @@ export const deleteProject = async (projectId: number) => {
 
 export const getProjectById = async (projectId: number) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/${projectId}`);
+    const response = await axios.get(`${API_BASE_URL}/?id=${projectId}`);
     console.log(`Project ${projectId} fetched from API:`, response.data);
     return response.data;
   } catch (error) {

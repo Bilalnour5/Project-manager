@@ -25,7 +25,7 @@ export const createTask = async (taskData: CreateTaskData) => {
 
 export const updateTask = async (taskId: number, taskData: TaskData) => {
   try {
-    const response = await axios.put(`${API_BASE_URL}/${taskId}`, taskData);
+    const response = await axios.put(`${API_BASE_URL}/${taskId}/`, taskData);
     return response.data;
   } catch (error) {
     console.error("Error updating task:", error);
@@ -45,13 +45,25 @@ export const deleteTask = async (taskId: number) => {
 
 export const getTasksByProject = async (projectId: number) => {
   try {
-    const response = await axios.get(
-      `${API_BASE_URL}/?project_id=${projectId}`
-    );
+    const response = await axios.get(`${API_BASE_URL}/?project=${projectId}`);
     console.log(response.data);
     return response.data;
   } catch (error) {
     console.error(`Error fetching tasks for project ${projectId}:`, error);
+    throw error;
+  }
+};
+
+export const getTasksByData = async (data: URLSearchParams) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/?${data.toString()}`);
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Error fetching tasks for project ${data.get("project")}:`,
+      error,
+    );
     throw error;
   }
 };

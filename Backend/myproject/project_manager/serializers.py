@@ -3,13 +3,17 @@ from .models import Project, Task
 
 
 class TaskSerializer(serializers.ModelSerializer):
+    total_tasks = serializers.IntegerField(read_only=True)
+
     class Meta:
         model =  Task
         fields = '__all__'
 
 class ProjectSerializer(serializers.ModelSerializer):
     task_count = serializers.SerializerMethodField(read_only=True)
-    
+    completed_tasks = serializers.IntegerField(read_only=True)
+    pending_tasks = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = Project
         fields = '__all__'

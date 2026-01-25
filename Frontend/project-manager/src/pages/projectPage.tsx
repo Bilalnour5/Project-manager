@@ -1,24 +1,29 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import IconButton from "@mui/material/IconButton";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import Sidebar from "../components/Sidebar";
 import "./projectPage.css";
 import "../layout.css";
 import { getProjectById } from "../services/projectService";
-import { getTasksByProject, createTask } from "../services/taskService";
+import {
+  getTasksByData,
+  createTask,
+  updateTask,
+} from "../services/taskService";
 import type { ProjectData } from "../types/projects";
 import type { TaskData } from "../types/tasks";
 import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutlineOutlined";
 import FormatListBulletedOutlinedIcon from "@mui/icons-material/FormatListBulletedOutlined";
-import AutorenewOutlinedIcon from "@mui/icons-material/AutorenewOutlined";
 
 function projectPage() {
-  const params = useParams();
-
-  const projectId = params.id ? parseInt(params.id) : 0;
-
+  const [searchParams, setSearchParams] = useSearchParams();
+  const projectId = Number(searchParams.get("project_id") || 1);
   const [project, setProject] = useState<ProjectData>();
-  const [task, setTask] = useState<TaskData[]>([]);
+  const [tasks, setTasks] = useState<TaskData[]>([]);
+  // const [taskUpdated, setTaskUpdated] = useState(false);
   const [addTaskOpen, setAddTaskOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [newTask, setNewTask] = useState<Omit<TaskData, "id">>({
     name: "",
@@ -35,10 +40,10 @@ function projectPage() {
     in_progress: "In Progress",
     completed: "Completed",
   };
-  // Creating Task object for form
 
+  // Handles input changes in the new task form
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     console.log(name, value);
@@ -51,11 +56,31 @@ function projectPage() {
     }));
   };
 
+  // Updates search params in the URL
+  const updateSearchParam = (key: string, value: string) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set(key, value);
+    setSearchParams(newParams);
+  };
+
+  // Updates task when checkbox is clicked
+  const handleTaskUpdate = async (task: TaskData) => {
+    try {
+      task.status = "completed";
+      await updateTask(task.id, task);
+      setTasks((currentTasks) => currentTasks.filter((t) => t.id !== task.id));
+      console.log("Updated task successfully");
+    } catch (error) {
+      console.error("Failed to update task", error);
+    }
+  };
+
+  // Submits new task form
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const createdTask = await createTask(newTask);
-      setTask((prevTasks) => [...prevTasks, createdTask]);
+      setTasks((prevTasks) => [...prevTasks, createdTask]);
       setAddTaskOpen(false);
     } catch (error) {
       console.error("Failed to create task:", error);
@@ -63,7 +88,7 @@ function projectPage() {
     console.log("Form submitted:", newTask);
   };
 
-  // Function to extract headers from TaskData
+  // Function to extract headers for the task table
   const extractHeadersFromData = (data: TaskData[]) => {
     if (!data || data.length === 0) return [];
     const keys = Object.keys(data[0]);
@@ -80,26 +105,28 @@ function projectPage() {
   };
 
   useEffect(() => {
-    const fetchProject = async () => {
+    if (!projectId) return;
+    console.log("fetching data for projectId:", projectId);
+    const loadData = async () => {
+      setIsLoading(true);
       try {
-        const data = await getProjectById(projectId);
-        setProject(data);
+        const [projectData, tasksData] = await Promise.all([
+          getProjectById(projectId),
+          getTasksByData(searchParams),
+        ]);
+
+        setProject(projectData[0]);
+        setTasks(tasksData);
       } catch (error) {
-        console.error("Failed to fetch projects:", error);
-      }
-    };
-    const fetchTasks = async () => {
-      try {
-        const data = await getTasksByProject(projectId);
-        setTask(data);
-      } catch (error) {
-        console.error("Failed to fetch tasks:", error);
+        console.error("Error loading page:", error);
+      } finally {
+        setIsLoading(false);
+        console.log(searchParams);
       }
     };
 
-    fetchProject();
-    fetchTasks();
-  }, []);
+    loadData();
+  }, [projectId, searchParams]);
 
   return (
     <>
@@ -111,7 +138,7 @@ function projectPage() {
           <div className="project_title_container">
             <div>
               <h1 className="project_title">Project Name: {project?.name}</h1>
-              <p>number of task 7</p>
+              <p>number of task {tasks.length}</p>
             </div>
 
             <button
@@ -122,39 +149,36 @@ function projectPage() {
             </button>
           </div>
           <div className="task_tracker">
-            <div className="task_todo task_tracker--info">
+            <div
+              className="task_todo task_tracker--info"
+              onClick={() => {
+                updateSearchParam("status", "not_started");
+              }}
+            >
               <div className="task_icon">
                 <FormatListBulletedOutlinedIcon
                   style={{ fontSize: 40, color: "#5150f3" }}
                 />
               </div>
               <div className="task_tracker--detail">
-                <h2>10</h2>
-                <p>To Do</p>
+                <h2>{project?.pending_tasks}</h2>
+                <p>Pending</p>
               </div>
             </div>
 
-            <div className="task_in_progress task_tracker--info">
-              <div className="task_icon">
-                <AutorenewOutlinedIcon
-                  style={{ fontSize: 40, color: "#F5A623" }}
-                />
-              </div>
-              <div className="task_tracker--detail">
-                <h2>5</h2>
-                <p>In Progress</p>
-              </div>
-              `
-            </div>
-
-            <div className="task_completed task_tracker--info">
+            <div
+              className="task_completed task_tracker--info"
+              onClick={() => {
+                updateSearchParam("status", "completed");
+              }}
+            >
               <div className="task_icon">
                 <CheckCircleOutlineOutlinedIcon
                   style={{ fontSize: 40, color: "#7ED321" }}
                 />
               </div>
               <div className="task_tracker--detail">
-                <h2>8</h2>
+                <h2>{project?.completed_tasks}</h2>
                 <p>Completed</p>
               </div>
             </div>
@@ -162,20 +186,33 @@ function projectPage() {
           <table className="task_table">
             <thead>
               <tr>
-                {extractHeadersFromData(task).map((header) => (
+                {extractHeadersFromData(tasks).map((header) => (
                   <th key={header.key}>{header.label}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {task.map((task) => (
+              {tasks.map((task: TaskData) => (
                 <tr key={task?.id}>
-                  <td>{task?.name}</td>
+                  <td>
+                    <input
+                      type="checkbox"
+                      onClick={() => handleTaskUpdate(task)}
+                    />
+                    {task?.name}
+                  </td>
                   <td>{task?.detail}</td>
                   <td>{task?.priority}</td>
                   <td>{task?.time_spent_hours}</td>
                   <td>{task?.estimated_hours}</td>
-                  <td>{statusMap[task?.status]}</td>
+                  <td>
+                    <div className="task_edit">
+                      {statusMap[task?.status]}
+                      <IconButton aria-label="settings">
+                        <MoreVertIcon />
+                      </IconButton>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -9,8 +9,6 @@
 }
 .task_tracker {
   display: flex;
-  justify-content: space-between;
-  width: 80%;
 }
 
 .task_tracker--info {
@@ -18,11 +16,19 @@
   background-color: #fff;
   justify-content: start;
   align-items: center;
-  width: 32%;
+  width: 25%;
   padding: 25px 15px;
   border-radius: 10px;
 }
 
+.task_tracker--info:not(:first-child) {
+  margin-left: 20px;
+}
+.task_tracker--info:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transform: scale(1.02);
+}
 .task_tracker--detail {
   display: flex;
   flex-direction: column;
@@ -63,6 +69,11 @@
   text-align: left;
 }
 
+.task_edit {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 /* Remove if needed and relocate add button to component */
 .add_task_button {
   background-color: #5150f3;

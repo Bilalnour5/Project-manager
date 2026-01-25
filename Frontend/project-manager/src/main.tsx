@@ -8,7 +8,7 @@ createRoot(document.getElementById("root")!).render(
   <Router>
     <Routes>
       <Route path="/dashboard" element={<MainPage />} />
-      <Route path="/project/:id" element={<ProjectPage />} />
+      <Route path="/project/" element={<ProjectPage />} />
     </Routes>
   </Router>
 );

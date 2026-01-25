@@ -35,7 +35,7 @@ function Sidebar() {
         </div>
       </Link>
       <Link
-        to="/project/1"
+        to="/project/?project_id=1"
         className={`sidebar_item ${isProjects ? "active_circle" : ""}`}
       >
         <FolderOutlinedIcon
