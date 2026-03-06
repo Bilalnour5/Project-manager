@@ -135,7 +135,11 @@ function FrontPage() {
                     </Typography>
                     <LinearProgress
                       variant="determinate"
-                      value={65}
+                      value={
+                        project.completed_tasks == project.task_count
+                          ? 100
+                          : (project.completed_tasks / project.task_count) * 100
+                      }
                       sx={{
                         height: 8,
                         borderRadius: 4,
@@ -148,7 +152,10 @@ function FrontPage() {
                       color="text.secondary"
                       sx={{ marginLeft: "auto" }}
                     >
-                      65%
+                      {project.completed_tasks == project.task_count
+                        ? 100
+                        : (project.completed_tasks / project.task_count) * 100}
+                      %
                     </Typography>
                   </Box>
                 </CardContent>

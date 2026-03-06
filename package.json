@@ -1,0 +1,11 @@
+{
+  "name": "my-fullstack-app",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "scripts": {
+    "server": " Backend\\projectEnv\\Scripts\\activate && python Backend/myproject/manage.py runserver",
+    "client": "npm run dev --prefix Frontend/project-manager",
+    "dev": "concurrently -n \"Django,React\" -c \"blue,magenta\" \"npm run server\" \"npm run client\""
+  }
+}

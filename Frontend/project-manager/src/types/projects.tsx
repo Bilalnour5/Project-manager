@@ -4,7 +4,7 @@ export interface ProjectData {
   deadline: string;
   status: "planned" | "in_progress" | "completed";
   id: number;
-  total_tasks: number;
+  task_count: number;
   completed_tasks: number;
   pending_tasks: number;
 }
