@@ -12,7 +12,7 @@ import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
 import { useState, useEffect } from "react";
 import { getProjects } from "../services/projectService";
-import { getTasks } from "../services/taskService";
+import { getTasks, updateTask } from "../services/taskService";
 import type { ProjectData } from "../types/projects";
 import type { TaskData } from "../types/tasks";
 import { useSearchParams, useNavigate } from "react-router-dom";
@@ -21,6 +21,8 @@ function FrontPage() {
   const [projects, setProjects] = useState<ProjectData[]>([]);
   const [tasks, setTasks] = useState<TaskData[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [completingIds, setCompletingIds] = useState<number[]>([]);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -51,6 +53,29 @@ function FrontPage() {
     fetchTasks();
   }, []);
 
+  const handleCompleteTask = async (task: TaskData) => {
+    setCompletingIds((prevIds) => [...prevIds, task.id]);
+
+    try {
+      // 2. The API Call (pure data, no fake properties!)
+      const dataToSend: TaskData = { ...task, status: "completed" };
+      await updateTask(task.id, dataToSend);
+
+      // 3. The Cleanup
+      setTimeout(() => {
+        // Remove the task from the main list
+        setTasks((prevTasks) => prevTasks.filter((t) => t.id !== task.id));
+
+        // Clean up our UI state too, so the ID doesn't get stuck in there forever
+        setCompletingIds((prevIds) => prevIds.filter((id) => id !== task.id));
+      }, 400);
+    } catch (error) {
+      // 4. The Fallback: Server failed.
+      // Simply remove the ID from the animating list to reverse the CSS transition.
+      console.error("Failed to update task on the server");
+      setCompletingIds((prevIds) => prevIds.filter((id) => id !== task.id));
+    }
+  };
   return (
     <>
       <div className="layout">
@@ -166,17 +191,17 @@ function FrontPage() {
         <div className="task_container">
           <div className="task_header">
             <h1>Tasks</h1>
-
             <SearchIcon sx={{ fontSize: 30 }} />
           </div>
-          {tasks.map((task) => (
-            <div className="task_item" key={task.id}>
-              <div className="task_item_container">
-                <div className="task_project"></div>
-                <div className="task_detail">
-                  <h2 className="task_name">{task.name}</h2>
-                  <p className="task_deadline">Deadline: N/A</p>
-                </div>
+          <ul className="task_list">
+            {tasks.map((task) => (
+              <li className="task-item" key={task.id}>
+                <button
+                  className="complete-btn"
+                  onClick={() => handleCompleteTask(task)}
+                  aria-label="Complete task"
+                />
+                <p>{task.name}</p>
                 <IconButton
                   aria-label="settings"
                   disabled
@@ -184,9 +209,9 @@ function FrontPage() {
                 >
                   <MoreVertIcon sx={{ fontSize: 40 }} />
                 </IconButton>
-              </div>
-            </div>
-          ))}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </>
