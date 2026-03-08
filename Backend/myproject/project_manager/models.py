@@ -3,13 +3,15 @@ from django.db import models
 # Create your models here.
 class Project(models.Model):
     name = models.CharField(max_length = 100)
-    description = models.TextField()
-    deadline = models.DateField()
+    description = models.TextField(blank=True, default="")
+    deadline = models.DateField(null=True, blank=True)
     status = models.CharField(max_length=20, choices=(
         ('planned', 'Planned'),
-        ('in_progress', 'In Progress'),
+        ('in_progress', 'In Progress'), 
         ('completed', 'Completed'),
-    ))
+    ),
+    default='planned'
+    )
     
 class Task(models.Model):
     project = models.ForeignKey(Project, on_delete= models.CASCADE, related_name='tasks')

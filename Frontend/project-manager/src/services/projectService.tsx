@@ -1,6 +1,6 @@
 import axios from "axios";
-import type { ProjectData } from "../types/projects";
-const API_BASE_URL = "http://localhost:8000/api/projects";
+import type { ProjectData, CreateProjectPayload } from "../types/projects";
+const API_BASE_URL = "http://localhost:8000/api/projects/";
 
 export const getProjects = async () => {
   try {
@@ -12,7 +12,7 @@ export const getProjects = async () => {
     throw error;
   }
 };
-export const createProject = async (projectData: ProjectData) => {
+export const createProject = async (projectData: CreateProjectPayload) => {
   try {
     const response = await axios.post(API_BASE_URL, projectData);
     return response.data;

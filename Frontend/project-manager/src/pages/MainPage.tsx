@@ -28,7 +28,6 @@ function FrontPage() {
   useEffect(() => {
     const query = searchParams.get("query") || "";
     console.log("Search query:", query);
-    // You can implement filtering logic here based on the query
   }, [searchParams]);
 
   useEffect(() => {
